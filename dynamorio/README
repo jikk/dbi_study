@@ -1,0 +1,27 @@
+How To
+
+1. Install Dependencies
+
+	sudo apt-get install cmake ia32-libs g++ g++-multilib doxygen transfig imagemagick ghostscript subversion
+
+2. Download Dynamorio
+
+	svn checkout http://dynamorio.googlecode.com/svn/trunk/ dynamorio
+
+3. Copy memtrace.c
+
+	cp memtrace.c dynamorio/api/samples/memtrace.c 
+
+4. compile
+
+	cd dynamorio && mkdir build && cd build
+	cmake ..
+	make -j
+
+5. run instruction count & memtrace
+
+
+	./bin32/drrun -client api/samples/bin/libinscount.so 0x1 "" /bin/ls
+
+	./bin32/drrun -client api/samples/bin/libmemtrace.so 0x1 "" /bin/ls
+
