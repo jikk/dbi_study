@@ -1,0 +1,28 @@
+% !TEX root = dbi.tex
+
+\begin{abstract}
+  % 1) what is the DBI framework and why these are important? -- explain a bit
+  % 2) what is the problem? 
+  % 3) what did we do?
+  % 4) and what is the result thus far?
+
+  Dynamic binary instrumentation(DBI) framworks enable the development of
+  program analysis tools for unknown binary by facilitating automatic low-level
+  instrumentation. This technique has become essential building blocks in
+  developing tools that enhances the security and reliablity of software
+  systems. Representative DBI frameworks for these are PIN, Valgrind, and
+  DynamoRIO.
+
+  Forming a same layer between a running application and underlying operating
+  system, each framework comes with different capabilties and performance
+  implications as each framework's design principles varies up to their major
+  target applications. However, developers who want to leverage the techonology
+  were rarely informed regarding how to choose a framework that meets their
+  development goal.
+
+  In this talk, we present an ongoing project that compars three aforementioned
+  frameworks by carefully examining three different aspects -- efficeincy,
+  capability, and userability. Purpose of our work is to provide a proper
+  guideline to developers who want to develop security analysis tools enhancing
+  this technology.
+\end{abstract}
