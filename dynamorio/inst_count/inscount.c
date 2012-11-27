@@ -55,6 +55,8 @@
 #define TESTANY(mask, var) (((mask) & (var)) != 0)
 /* we only have a global count */
 static uint64 global_count;
+static uint64 over_count;
+//static uint64 before_count;
 /* A simple clean call that will be automatically inlined because it has only 
  * one argument and contains no calls to other functions.
  */
@@ -88,8 +90,11 @@ static void
 event_exit(void)
 {
 #ifdef SHOW_RESULTS
+
     char msg[512];
     int len;
+
+	global_count += over_count * 4294967296;
     len = dr_snprintf(msg, sizeof(msg)/sizeof(msg[0]),
                       "Instrumentation results: %llu instructions executed\n",
                       global_count);
@@ -99,52 +104,88 @@ event_exit(void)
 #endif /* SHOW_RESULTS */
 }
 
+//static void inscount(uint num_instrs) { global_count ++; }
+
 static dr_emit_flags_t
 event_basic_block(void *drcontext, void *tag, instrlist_t *bb,
                   bool for_trace, bool translating)
 {
-    instr_t *instr, *first = instrlist_first(bb), *point = NULL;
-    uint num_instrs;
-	uint flags;
-    
-
-    for (instr  = first, num_instrs = 0;
-         instr != NULL;
-         instr = instr_get_next(instr)) {
-        num_instrs++;
+    instr_t *instr, *first = instrlist_first(bb);//, *point = NULL;
+//    uint num_instrs;
+//	int flags;
+	int need_restore;
 
 /*
+	if (before_count > global_count) {
+		over_count++;
+	}
+	before_count = global_count;
+	*/
+	/*
+	for (instr = first, num_instrs = 0; instr != NULL; instr = instr_get_next(instr))
+		num_instrs++;
+	*/
+
+	dr_save_arith_flags(drcontext, bb, first, SPILL_SLOT_1);
+    for (instr  = first;
+         instr != NULL;
+         instr = instr_get_next(instr)) {
+		 need_restore = 0;
+		 /*
 		flags = instr_get_arith_flags(instr);
 		if (TESTALL(EFLAGS_WRITE_6, flags) && !TESTANY(EFLAGS_READ_6, flags)) {
-			point = instr;
-			for (; instr != NULL; instr = instr_get_next(instr))
-				num_instrs++;
-			break;
+		*/
+
+		instrlist_meta_preinsert
+			(bb, first,
+			 INSTR_CREATE_add(drcontext, OPND_CREATE_ABSMEM
+								   ((byte *)&global_count, OPSZ_4), OPND_CREATE_INT32(1)));
+		instrlist_meta_preinsert
+			(bb, first,
+			 INSTR_CREATE_adc(drcontext, OPND_CREATE_ABSMEM
+								   ((byte *)&global_count + 4, OPSZ_4), OPND_CREATE_INT32(0)));
+	}
+	dr_restore_arith_flags(drcontext, bb, first, SPILL_SLOT_1);
+//	dr_printf("count %llu \n", global_count);
+/*
+	if (instr == NULL) {
+		dr_save_arith_flags(drcontext, bb, first, SPILL_SLOT_1);
+		while (num_instrs-- > 0)
+			instrlist_meta_preinsert
+				(bb, first,
+				 INSTR_CREATE_inc(drcontext, OPND_CREATE_ABSMEM
+									   ((byte *)&global_count, OPSZ_4)));
+		dr_restore_arith_flags(drcontext, bb, first, SPILL_SLOT_1);
+	}
+	else {
+		while (num_instrs-- > 0)
+    instrlist_meta_preinsert
+        (bb, instr,
+         INSTR_CREATE_inc(drcontext, OPND_CREATE_ABSMEM
+                               ((byte *)&global_count, OPSZ_4)));
+	}
+		if (!(TESTALL(EFLAGS_WRITE_6, flags) && !TESTANY(EFLAGS_READ_6, flags))) {
+			need_restore = 1;
+			dr_save_arith_flags(drcontext, bb, instr, SPILL_SLOT_1);
+		}
+
+    instrlist_meta_preinsert
+        (bb, instr,
+         INSTR_CREATE_inc(drcontext, OPND_CREATE_ABSMEM
+                               ((byte *)&global_count, OPSZ_4)));
+
+		if (need_restore) {
+//			next_instr = instr_get_next(instr);
+//			flags = instr_get_arith_flags(next_instr);
+
+//			if (next_instr 
+			dr_restore_arith_flags(drcontext, bb, instr, SPILL_SLOT_1);
 		}
 		*/
-    }
+
+//        num_instrs++;
+
 	
-	if (point == NULL) {
-		dr_save_reg(drcontext, bb, first, DR_REG_XAX, SPILL_SLOT_1);
-		dr_save_arith_flags_to_xax(drcontext, bb, first);
-	}
-//	else first = point;
-
-    instrlist_meta_preinsert
-        (bb, first,
-         INSTR_CREATE_add(drcontext, OPND_CREATE_ABSMEM
-                               ((byte *)&global_count, OPSZ_4), OPND_CREATE_INT32(num_instrs)));
-
-    instrlist_meta_preinsert
-        (bb, first,
-         INSTR_CREATE_adc(drcontext, OPND_CREATE_ABSMEM
-                               ((byte *)&global_count + 4, OPSZ_4), OPND_CREATE_INT32(0)));
-
-	if (point == NULL) {
-		dr_restore_arith_flags_from_xax(drcontext, bb, first);
-		dr_restore_reg(drcontext, bb, first, DR_REG_XAX, SPILL_SLOT_1);
-	}
-
 /*
     dr_insert_clean_call(drcontext, bb, instrlist_first(bb), 
                          (void *)inscount, false , 1,
