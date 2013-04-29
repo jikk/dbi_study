@@ -1,3 +1,76 @@
 % !TEX root = dbi.tex
 \section{Evaluation}
 \label{sec:evaluation}
+\subsection{Usability}
+\subsection{Capability}
+\subsubsection{Injection}
+This is about how VM context is attached to the application context under Linux.
+\begin{itemize}
+	\item PIN: ptrace() API.
+	Can attach/detach to already running process.
+	Can work with statically-linked binaries
+	\item Valgrind: Custom Loader.
+	Gives great control over memory layout.
+	Avoids dependencies on other tools.
+	\item DynamoRIO: LD\_PRELOAD.
+	Does not work with statically-linked binaries
+	Loading extra shared library will shift shared libraries to higher address.
+	Some code can run before gaining control.
+	But Transparent to debuggers.
+\end{itemize}
+\subsubsection{Instrumentation}
+\begin{itemize}
+	\item Copy-and-Annotate (C\&A)
+	\begin{itemize}
+		\item PIN 
+		\item DynamoRIO
+	\end{itemize}
+	Incoming instructions are copied except for necessary control flow changes.
+	Instructions are annotated with a description of its effect.
+	\item Disassemble-and-Resynthesis (D\&R)
+	\begin{itemize}
+		\item Valgrind
+	\end{itemize}
+	Mach Code -> IR -> Instrument -> Mach Code.
+	D\&R's  use of the same IR for both client and analysis code.
+	Analysis code is as expressive and powerful as client code. 
+\end{itemize}
+\subsubsection{Isolation}
+\begin{itemize}
+	\item How two different contexts are separated and exists without any collision
+	\item Library (e.g., libc)
+	\begin{itemize}
+		\item PIN 
+		\begin{itemize}
+			\item Separate copies of glibc for application, pin, pintool
+		\end{itemize}
+		\item DynamoRIO
+		\begin{itemize}
+			\item Custom loader
+		\end{itemize}
+		\item Valgrind 
+		\begin{itemize}
+			\item Separate copies of libraries for application and DynamoRIO
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+\subsubsection{Transparancy}
+\subsection{Performance}
+\begin{itemize}
+	\item Application Models
+	\begin{itemize}
+		\item No Instrumentation
+		\item Instruction counter
+		\begin{itemize}
+			\item Naive instruction counter.
+			\item Optimized by BB instruction counter
+		\end{itemize}
+		\item Memory Profiler
+		\begin{itemize}
+			\item Ring-buffer model
+			\item Effective address categorization
+			\item Ring-buffer + EA categorization
+			\item Shadow address calculation
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
