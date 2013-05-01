@@ -4,13 +4,18 @@ DVIPS=dvips -Ppdf
 DVIPDF=dvipdf
 DVIPDF=dvipdfm
 PDFLATEX=pdflatex --shell-escape
+GNUPLOT=gnuplot
 
 TEX-FILES = *.tex
 FIG-FILES = *.eps
 BIB-FILES = dbi.bib
 PDF-FILES = empty.pdf
+GRH-FILES = bzip_perf.plot
 
-all: dbi.pdf
+all: clean graph dbi.pdf
+
+graph: 
+	gnuplot bzip_perf.plot
 
 dbi.pdf:  ${TEX-FILES} ${BIB-FILES}
 	$(PDFLATEX) dbi

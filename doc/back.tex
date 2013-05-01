@@ -12,5 +12,22 @@
 \subsubsection{Valgrind}
 \subsection{Performance Consideration}
 \subsubsection{VM Cost}
+\begin{description}
+  \item[$\bullet$] PIN and Valgrind has register allocation cost.
+  \item[$\bullet$] DynamoRIO: User allocates register.
+\end{description}
 \subsubsection{Code Cache Cost}
+\begin{description}
+  \item[$\bullet$] Code Cache Enter \& Exit (Context Switch)
+  \item[$\bullet$] Register Fill Spill
+  \item[$\bullet$] eflag Fill Spill
+  \item[$\bullet$] Hashtable Lookup
+\end{description}
+\subsubsection{Analysis Cost}
+\begin{description}
+  \item[$\bullet$] When does analysis function get inlined?
+\end{description}
 \subsubsection{Misc. Cost}
+\begin{description}
+  \item[$\bullet$] What else?
+\end{description}
