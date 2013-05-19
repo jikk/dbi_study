@@ -1,0 +1,19 @@
+\section{Design and Performance Consideration}
+\label{sec:design}
+DBI can be broken down to three parts: virtual machine (VM), code cache, and instrumentation code. The VM coordinates its components to run the target program efficiently. 
+\subsection{VM Cost}
+What VM does differs from dbi to dbi but in the high level, the VM instruments the target application code one basic block at a time and copys it into the code cache. 
+\begin{description}
+  \item[$\bullet$] PIN and Valgrind has register allocation cost.
+  \item[$\bullet$] DynamoRIO: User allocates register.
+\end{description}
+\subsection{Code Cache Cost}
+Code cache is the instrumented application code that is actually executed. Code cache not only has the target application code, but it has various setup codes to properly run the application. The DBI enters the code cache from VM and vice versa using context switch which involves saving and restoring register states. Moreover, user added code may require additional register which could result in register spill/fill. The added code can also affect eflag which also requires flag spill/spill. At the basic block exit, the DBI attempts to branch directly into the next basic block.
+\subsection{Instrumentation Code Cost}
+\begin{description}
+  \item[$\bullet$] When does analysis function get inlined?
+\end{description}
+\subsection{Misc. Cost}
+\begin{description}
+  \item[$\bullet$] What else?
+\end{description}
