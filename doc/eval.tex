@@ -5,20 +5,7 @@
 \subsection{Usability}
 \subsection{Capability}
 \subsubsection{Injection}
-This is about how VM context is attached to the application context under Linux.
-\begin{itemize}
-	\item PIN: ptrace() API.
-	Can attach/detach to already running process.
-	Can work with statically-linked binaries
-	\item Valgrind: Custom Loader.
-	Gives great control over memory layout.
-	Avoids dependencies on other tools.
-	\item DynamoRIO: LD\_PRELOAD.
-	Does not work with statically-linked binaries
-	Loading extra shared library will shift shared libraries to higher address.
-	Some code can run before gaining control.
-	But Transparent to debuggers.
-\end{itemize}
+For DBIs to instrument the target application, they need to be attached to the application context. PIN, Valgrind, and DynamoRIO all uses different techniques to attach the DBI. PIN uses ptrace API provided by linux. The advantage of the ptrace API is that it can attach and detach to already running process. It can also work with statically-linked binaries. Valgrind uses their own program loader which gives great control over memory layout. It also avoids dependencies on other tools. DynamoRIO uses LD\_PRELOAD instead of using ptrace. Choosing LD\_PRELOAD makes DynamoRIO transparent to debuggers. However, loading extra shared library may result in shifting shared libraries to higher address.
 \subsubsection{Instrumentation}
 \begin{itemize}
 	\item Copy-and-Annotate (C\&A)
@@ -32,7 +19,7 @@ This is about how VM context is attached to the application context under Linux.
 	\begin{itemize}
 		\item Valgrind
 	\end{itemize}
-	Mach Code -> IR -> Instrument -> Mach Code.
+	Mach Code to IR to Instrument to Mach Code.
 	D\&R's  use of the same IR for both client and analysis code.
 	Analysis code is as expressive and powerful as client code. 
 \end{itemize}

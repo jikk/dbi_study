@@ -1,34 +1,8 @@
 % !TEX root = dbi.tex
-
-\section{Background}
-\label{sec:background}
-\subsection{Dynamic Binary Instrumentation}
-\begin{description}
-  \item[$\bullet$] Process-wide virtualization. In contrast to system VM (VMWare, Xen)
-  \item[$\bullet$] Relatively-high performance overhead. From 2x to 50x depends on instrumentation/analysis
-  \item[$\bullet$] 3 major players. PIN, Valgrind, DynamoRIO. Different design philosophies and performance implications
-\end{description}
+%\section{Background}
+\section{Dynamic Binary Instrumentation}
+\label{sec:overview}
+In contrast to system VM like VMware and Xen, Dynamic Binary Instrumentation is a process-wide virtualization. It has a relatively-high performance overhead, from 2x to 50x depending on the instrumentation and the analysis. There are 3 major players:PIN, Valgrind, DynamoRIO and each platform has different design philosophies and performance implications.
 \subsubsection{PIN}
 \subsubsection{DynamoRIO}
 \subsubsection{Valgrind}
-\subsection{Performance Consideration}
-\subsubsection{VM Cost}
-\begin{description}
-  \item[$\bullet$] PIN and Valgrind has register allocation cost.
-  \item[$\bullet$] DynamoRIO: User allocates register.
-\end{description}
-\subsubsection{Code Cache Cost}
-\begin{description}
-  \item[$\bullet$] Code Cache Enter \& Exit (Context Switch)
-  \item[$\bullet$] Register Fill Spill
-  \item[$\bullet$] eflag Fill Spill
-  \item[$\bullet$] Hashtable Lookup
-\end{description}
-\subsubsection{Analysis Cost}
-\begin{description}
-  \item[$\bullet$] When does analysis function get inlined?
-\end{description}
-\subsubsection{Misc. Cost}
-\begin{description}
-  \item[$\bullet$] What else?
-\end{description}
