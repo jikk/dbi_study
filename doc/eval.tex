@@ -3,47 +3,9 @@
 \section{Evaluation}
 \label{sec:evaluation}
 \subsection{Usability}
-\subsection{Capability}
-\subsubsection{Injection}
-For DBIs to instrument the target application, they need to be attached to the application context. PIN, Valgrind, and DynamoRIO all uses different techniques to attach the DBI. PIN uses ptrace API provided by linux. The advantage of the ptrace API is that it can attach and detach to already running process. It can also work with statically-linked binaries. Valgrind uses their own program loader which gives great control over memory layout. It also avoids dependencies on other tools. DynamoRIO uses LD\_PRELOAD instead of using ptrace. Choosing LD\_PRELOAD makes DynamoRIO transparent to debuggers. However, loading extra shared library may result in shifting shared libraries to higher address.
-\subsubsection{Instrumentation}
-\begin{itemize}
-	\item Copy-and-Annotate (C\&A)
-	\begin{itemize}
-		\item PIN 
-		\item DynamoRIO
-	\end{itemize}
-	Incoming instructions are copied except for necessary control flow changes.
-	Instructions are annotated with a description of its effect.
-	\item Disassemble-and-Resynthesis (D\&R)
-	\begin{itemize}
-		\item Valgrind
-	\end{itemize}
-	Mach Code to IR to Instrument to Mach Code.
-	D\&R's  use of the same IR for both client and analysis code.
-	Analysis code is as expressive and powerful as client code. 
-\end{itemize}
-\subsubsection{Isolation}
-\begin{itemize}
-	\item How two different contexts are separated and exists without any collision
-	\item Library (e.g., libc)
-	\begin{itemize}
-		\item PIN 
-		\begin{itemize}
-			\item Separate copies of glibc for application, pin, pintool
-		\end{itemize}
-		\item DynamoRIO
-		\begin{itemize}
-			\item Custom loader
-		\end{itemize}
-		\item Valgrind 
-		\begin{itemize}
-			\item Separate copies of libraries for application and DynamoRIO
-		\end{itemize}
-	\end{itemize}
-\end{itemize}
-\subsubsection{Transparancy}
 \subsection{Performance}
+We compare each DBI tools side by side using several application models. The first model is the no instrumentation model.
+This model will be used to see the overhead of the DBI itself. The second model is the instruction counter.
 \begin{itemize}
 	\item Application Models
 	\begin{itemize}

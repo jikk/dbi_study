@@ -4,16 +4,69 @@ DBI can be broken down to three parts: virtual machine (VM), code cache, and ins
 \subsection{VM Cost}
 What VM does differs from dbi to dbi but in the high level, the VM instruments the target application code one basic block at a time and copys it into the code cache. 
 \begin{description}
-  \item[$\bullet$] PIN and Valgrind has register allocation cost.
+  \item[$\bullet$] PIN has register allocation cost.
   \item[$\bullet$] DynamoRIO: User allocates register.
 \end{description}
 \subsection{Code Cache Cost}
 Code cache is the instrumented application code that is actually executed. Code cache not only has the target application code, but it has various setup codes to properly run the application. The DBI enters the code cache from VM and vice versa using context switch which involves saving and restoring register states. Moreover, user added code may require additional register which could result in register spill/fill. The added code can also affect eflag which also requires flag spill/spill. At the basic block exit, the DBI attempts to branch directly into the next basic block.
 \subsection{Instrumentation Code Cost}
 \begin{description}
-  \item[$\bullet$] When does analysis function get inlined?
+  \item[$\bullet$] PIN inlines the analysis function. When does analysis function get inlined?
 \end{description}
 \subsection{Misc. Cost}
 \begin{description}
   \item[$\bullet$] What else?
 \end{description}
+\subsection{Capability}
+\subsubsection{Injection}
+
+For DBIs to instrument the target application, they need to be
+attached to the application context. PIN, Valgrind, and DynamoRIO all
+uses different techniques to attach the DBI. PIN uses ptrace API
+provided by linux. The advantage of the ptrace API is that it can
+attach and detach to already running process. It can also work with
+statically-linked binaries. Valgrind uses their own program loader
+which gives great control over memory layout. It also avoids
+dependencies on other tools. DynamoRIO uses LD\_PRELOAD instead of
+using ptrace. Choosing LD\_PRELOAD makes DynamoRIO transparent to
+debuggers. However, loading extra shared library may result in
+shifting shared libraries to higher address.
+
+\subsubsection{Instrumentation}
+\begin{itemize}
+	\item Copy-and-Annotate (C\&A)
+	\begin{itemize}
+		\item PIN
+		\item DynamoRIO
+	\end{itemize}
+	Incoming instructions are copied except for necessary control flow changes.
+	Instructions are annotated with a description of its effect.
+	\item Disassemble-and-Resynthesis (D\&R)
+	\begin{itemize}
+		\item Valgrind
+	\end{itemize}
+	Machine code is translated to IR first and then back to machine code again.
+	User does not need to handle about eflag and register spill/fill since the machine code is recompiled from IR code.
+	D\&R's  use of the same IR for both client and analysis code.
+	Analysis code is as expressive and powerful as client code.
+\end{itemize}
+\subsubsection{Isolation}
+\begin{itemize}
+	\item How two different contexts are separated and exists without any collision
+	\item Library (e.g., libc)
+	\begin{itemize}
+		\item PIN
+		\begin{itemize}
+			\item Separate copies of glibc for application, pin, pintool
+		\end{itemize}
+		\item DynamoRIO
+		\begin{itemize}
+			\item Custom loader
+		\end{itemize}
+		\item Valgrind
+		\begin{itemize}
+			\item Separate copies of libraries for application and DynamoRIO
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+\subsubsection{Transparancy}
